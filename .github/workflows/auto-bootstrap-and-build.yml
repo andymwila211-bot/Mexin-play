@@ -1,4 +1,4 @@
-.name: Auto-Bootstrap and Build
+name: Auto-Bootstrap and Build
 
 on:
   push:
