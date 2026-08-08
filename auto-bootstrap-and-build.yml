@@ -1,0 +1,66 @@
+name: Auto-Bootstrap and Build
+
+# Fully automatic — no manual "Run workflow" step needed. Fires the
+# instant mexin-play-core-player.zip is pushed to the repo root.
+#
+# What it does, in order:
+#  1. Extracts the zip into real, individually-tracked files
+#  2. Deletes the zip
+#  3. Deletes THIS workflow file (one-time use — after this run,
+#     android-build.yml is the only workflow left, and it runs normally
+#     on every future push)
+#  4. Commits and pushes all of the above
+#  5. Runs the actual unit tests + assemble, in the same run, so you get
+#     a real pass/fail without a second push
+#
+# Safe from a trigger loop: commits made with the default GITHUB_TOKEN
+# do not themselves trigger new workflow runs, so step 4's push won't
+# re-fire this file (moot anyway, since the file deletes itself in the
+# same commit).
+
+on:
+  push:
+    paths:
+      - 'mexin-play-core-player.zip'
+
+jobs:
+  bootstrap-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract zip at repo root
+        run: unzip -o mexin-play-core-player.zip -d .
+
+      - name: Remove zip and this bootstrap workflow
+        run: |
+          rm -f mexin-play-core-player.zip
+          rm -f .github/workflows/auto-bootstrap-and-build.yml
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Bootstrap: extract scaffold, remove zip and self"
+          git push
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Run core-player unit tests
+        run: gradle :core-player:testDebugUnitTest
+
+      - name: Assemble core-player
+        run: gradle :core-player:assembleDebug
