@@ -39,39 +39,29 @@ jobs:
             gradle :core-player:testDebugUnitTest --stacktrace
           fi
 
-      - name: Build core-player (library — produces .aar)
+      - name: Build library modules (core-player, core-ui-glass, feature-pulse, feature-flux)
         run: |
           if [ -f "./gradlew" ]; then
-            ./gradlew :core-player:assembleDebug --stacktrace
+            ./gradlew :core-player:assembleDebug :core-ui-glass:assembleDebug :feature-pulse:assembleDebug :feature-flux:assembleDebug --stacktrace
           else
-            gradle :core-player:assembleDebug --stacktrace
+            gradle :core-player:assembleDebug :core-ui-glass:assembleDebug :feature-pulse:assembleDebug :feature-flux:assembleDebug --stacktrace
           fi
 
-      - name: Build core-ui-glass (library — produces .aar)
+      - name: Build app (installable .apk)
         run: |
           if [ -f "./gradlew" ]; then
-            ./gradlew :core-ui-glass:assembleDebug --stacktrace
+            ./gradlew :app:assembleDebug --stacktrace
           else
-            gradle :core-ui-glass:assembleDebug --stacktrace
+            gradle :app:assembleDebug --stacktrace
           fi
 
-      - name: Build feature-pulse (library — produces .aar)
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew :feature-pulse:assembleDebug --stacktrace
-          else
-            gradle :feature-pulse:assembleDebug --stacktrace
-          fi
+      - name: Upload app .apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: mexin-play-app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
 
-      - name: Build feature-flux (library — produces .aar)
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew :feature-flux:assembleDebug --stacktrace
-          else
-            gradle :feature-flux:assembleDebug --stacktrace
-          fi
-
-      - name: Upload all .aar outputs
+      - name: Upload library .aar outputs
         uses: actions/upload-artifact@v4
         with:
           name: mexin-play-debug-aars
