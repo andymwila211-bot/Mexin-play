@@ -79,44 +79,4 @@ jobs:
             core-player/build/outputs/aar/*.aar
             core-ui-glass/build/outputs/aar/*.aar
             feature-pulse/build/outputs/aar/*.aar
-            feature-flux/build/outputs/aar/*.aar        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew :feature-pulse:assembleDebug --stacktrace
-          else
-            gradle :feature-pulse:assembleDebug --stacktrace
-          fi
-
-      - name: Build feature-flux (library — produces .aar)
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew :feature-flux:assembleDebug --stacktrace
-          else
-            gradle :feature-flux:assembleDebug --stacktrace
-          fi
-
-      - name: Upload all .aar outputs
-        uses: actions/upload-artifact@v4
-        with:
-          name: mexin-play-debug-aars
-          path: |
-            core-player/build/outputs/aar/*.aar
-            core-ui-glass/build/outputs/aar/*.aar
-            feature-pulse/build/outputs/aar/*.aar
-            feature-flux/build/outputs/aar/*.aar            ./gradlew :core-player:testDebugUnitTest --stacktrace
-          else
-            gradle :core-player:testDebugUnitTest --stacktrace
-          fi
-
-      - name: Build core-player (library — produces .aar, no app module yet)
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew :core-player:assembleDebug --stacktrace
-          else
-            gradle :core-player:assembleDebug --stacktrace
-          fi
-
-      - name: Upload core-player .aar
-        uses: actions/upload-artifact@v4
-        with:
-          name: core-player-debug-aar
-          path: core-player/build/outputs/aar/*.aar
+            feature-flux/build/outputs/aar/*.aar
